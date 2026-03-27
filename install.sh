@@ -4,17 +4,26 @@ set -euo pipefail
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPTS_DIR="$DOTFILES_DIR/scripts"
 
-usage() {
-    echo "Usage: $0 [module ...]"
-    echo ""
-    echo "Modules:"
+list_modules() {
+    local prefix="${1:-  }"
+    local found=0
     for script in "$SCRIPTS_DIR"/install_*.sh; do
         [[ -f "$script" ]] || continue
         local name
         name="$(basename "$script" .sh)"
-        name="${name#install_}"
-        echo "  $name"
+        echo "${prefix}${name#install_}"
+        found=1
     done
+    if [[ "$found" -eq 0 ]]; then
+        echo "${prefix}(모듈 없음)"
+    fi
+}
+
+usage() {
+    echo "Usage: $0 [module ...]"
+    echo ""
+    echo "Modules:"
+    list_modules "  "
     echo ""
     echo "인자 없이 실행하면 모든 모듈을 설치합니다."
 }
@@ -25,12 +34,7 @@ run_module() {
     if [[ ! -f "$script" ]]; then
         echo "[에러] 모듈을 찾을 수 없습니다: $name"
         echo "  사용 가능한 모듈:"
-        for s in "$SCRIPTS_DIR"/install_*.sh; do
-            [[ -f "$s" ]] || continue
-            local n
-            n="$(basename "$s" .sh)"
-            echo "    ${n#install_}"
-        done
+        list_modules "    "
         return 1
     fi
     bash "$script"
