@@ -11,12 +11,16 @@ if ! command -v tmux &>/dev/null; then
 fi
 
 # 대상 디렉토리 생성
-mkdir -p ~/.config/tmux
+mkdir -p "$HOME/.config/tmux"
 
 # 백업 및 복사 함수
 install_file() {
     local src="$1"
     local dest="$2"
+    if [[ ! -f "$src" ]]; then
+        echo "  [에러] 소스 파일을 찾을 수 없습니다: $src"
+        return 1
+    fi
     if [[ -f "$dest" ]]; then
         echo "  [백업] $dest -> ${dest}.bak"
         cp "$dest" "${dest}.bak"
