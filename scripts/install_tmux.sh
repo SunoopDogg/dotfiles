@@ -44,9 +44,10 @@ else
 fi
 
 # TPM 플러그인 설치
+export TMUX_PLUGIN_MANAGER_PATH="$HOME/.config/tmux/plugins"
 if [[ -x "$TPM_DIR/bin/install_plugins" ]]; then
     echo "  [설치] tmux 플러그인"
-    "$TPM_DIR/bin/install_plugins"
+    "$TPM_DIR/bin/install_plugins" || echo "  [경고] 플러그인 자동 설치에 실패했습니다. tmux 실행 후 prefix + I로 수동 설치하세요."
 else
     echo "  [경고] TPM install_plugins를 실행할 수 없습니다. tmux 실행 후 prefix + I로 수동 설치하세요."
 fi
