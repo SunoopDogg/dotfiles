@@ -30,6 +30,6 @@ install_file() {
 }
 
 # Copy config file
-install_file "$DOTFILES_DIR/ghostty/config.ghostty" "$HOME/.config/ghostty/config.ghostty"
+install_file "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"
 
 echo "==> ghostty config installed"
