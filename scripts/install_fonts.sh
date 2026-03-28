@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$DOTFILES_DIR/scripts/_lib.sh"
+
 FONT_DIR="$HOME/.local/share/fonts"
 
 echo "==> Installing fonts"
+
+check_commands curl unzip fc-cache || exit 1
 
 # Create font directory
 mkdir -p "$FONT_DIR"
@@ -11,7 +16,14 @@ mkdir -p "$FONT_DIR"
 # Fetch latest release tag from GitHub API
 get_latest_release() {
     local repo="$1"
-    curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4
+    local tag
+    tag="$(curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" 2>/dev/null \
+        | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)" || true
+    if [[ -z "$tag" ]]; then
+        echo "  [ERROR] Failed to fetch latest release for ${repo}" >&2
+        return 1
+    fi
+    echo "$tag"
 }
 
 # Download and extract zip from GitHub release
@@ -43,19 +55,28 @@ download_font() {
 }
 
 # -- FiraCode Nerd Font (from ryanoasis/nerd-fonts) --
-echo "  Fetching latest nerd-fonts release..."
-NERD_VERSION="$(get_latest_release "ryanoasis/nerd-fonts")"
-echo "  Installing FiraCode Nerd Font ${NERD_VERSION}..."
-download_release_zip "ryanoasis/nerd-fonts" "$NERD_VERSION" "FiraCode.zip" "$FONT_DIR"
+if NERD_VERSION="$(get_latest_release "ryanoasis/nerd-fonts")"; then
+    echo "  Installing FiraCode Nerd Font ${NERD_VERSION}..."
+    download_release_zip "ryanoasis/nerd-fonts" "$NERD_VERSION" "FiraCode.zip" "$FONT_DIR" \
+        || echo "  [WARN] Failed to install FiraCode Nerd Font"
+else
+    echo "  [WARN] Skipping FiraCode Nerd Font (could not fetch version)"
+fi
 
 # -- Fira Code (from tonsky/FiraCode) --
-echo "  Fetching latest FiraCode release..."
-FIRACODE_VERSION="$(get_latest_release "tonsky/FiraCode")"
-echo "  Installing Fira Code ${FIRACODE_VERSION}..."
-FIRACODE_TMP="$(mktemp -d /tmp/firacode-XXXXXX)"
-download_release_zip "tonsky/FiraCode" "$FIRACODE_VERSION" "Fira_Code_v${FIRACODE_VERSION}.zip" "$FIRACODE_TMP"
-cp "$FIRACODE_TMP"/ttf/*.ttf "$FONT_DIR/"
-rm -rf "$FIRACODE_TMP"
+if FIRACODE_VERSION="$(get_latest_release "tonsky/FiraCode")"; then
+    FIRACODE_VERSION="${FIRACODE_VERSION#v}"
+    echo "  Installing Fira Code ${FIRACODE_VERSION}..."
+    FIRACODE_TMP="$(mktemp -d /tmp/firacode-XXXXXX)"
+    if download_release_zip "tonsky/FiraCode" "$FIRACODE_VERSION" "Fira_Code_v${FIRACODE_VERSION}.zip" "$FIRACODE_TMP"; then
+        cp "$FIRACODE_TMP"/ttf/*.ttf "$FONT_DIR/"
+    else
+        echo "  [WARN] Failed to install Fira Code"
+    fi
+    rm -rf "$FIRACODE_TMP"
+else
+    echo "  [WARN] Skipping Fira Code (could not fetch version)"
+fi
 
 # -- MesloLGS NF (from romkatv/powerlevel10k-media) --
 MESLO_BASE="https://github.com/romkatv/powerlevel10k-media/raw/master"
@@ -71,7 +92,8 @@ echo "  Installing MesloLGS NF..."
 for entry in "${MESLO_FONTS[@]}"; do
     url_name="${entry%%|*}"
     filename="${entry##*|}"
-    download_font "${MESLO_BASE}/${url_name}" "${FONT_DIR}/${filename}"
+    download_font "${MESLO_BASE}/${url_name}" "${FONT_DIR}/${filename}" \
+        || echo "  [WARN] Failed to download ${filename}"
 done
 
 # Refresh font cache

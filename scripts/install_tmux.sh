@@ -2,8 +2,11 @@
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$DOTFILES_DIR/scripts/_lib.sh"
 
 echo "==> Installing tmux config"
+
+check_commands git || exit 1
 
 # Check if tmux is installed
 if ! command -v tmux &>/dev/null; then
@@ -13,39 +16,13 @@ fi
 # Create target directories
 mkdir -p "$HOME/.config/tmux"
 
-# Backup and copy helper
-install_file() {
-    local src="$1"
-    local dest="$2"
-    if [[ ! -f "$src" ]]; then
-        echo "  [ERROR] Source file not found: $src"
-        return 1
-    fi
-    if [[ -f "$dest" ]]; then
-        echo "  [BACKUP] $dest -> ${dest}.bak"
-        cp "$dest" "${dest}.bak"
-    fi
-    cp "$src" "$dest"
-    echo "  [COPY] $src -> $dest"
-}
-
 # Copy config files
 install_file "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
 install_file "$DOTFILES_DIR/tmux/keybindings.conf" "$HOME/.config/tmux/keybindings.conf"
 
 # Copy theme.conf with home directory substitution for portability
-src="$DOTFILES_DIR/tmux/theme.conf"
-dest="$HOME/.config/tmux/theme.conf"
-if [[ ! -f "$src" ]]; then
-    echo "  [ERROR] Source file not found: $src"
-else
-    if [[ -f "$dest" ]]; then
-        echo "  [BACKUP] $dest -> ${dest}.bak"
-        cp "$dest" "${dest}.bak"
-    fi
-    sed "s|/home/airo-workstation|$HOME|g" "$src" > "$dest"
-    echo "  [COPY] $src -> $dest (home path substituted)"
-fi
+install_file "$DOTFILES_DIR/tmux/theme.conf" "$HOME/.config/tmux/theme.conf"
+sed -i "s|__HOME__|$HOME|g" "$HOME/.config/tmux/theme.conf"
 
 # Install TPM
 TPM_DIR="$HOME/.config/tmux/plugins/tpm"
