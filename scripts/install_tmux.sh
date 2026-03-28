@@ -32,7 +32,20 @@ install_file() {
 # Copy config files
 install_file "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
 install_file "$DOTFILES_DIR/tmux/keybindings.conf" "$HOME/.config/tmux/keybindings.conf"
-install_file "$DOTFILES_DIR/tmux/theme.conf" "$HOME/.config/tmux/theme.conf"
+
+# Copy theme.conf with home directory substitution for portability
+src="$DOTFILES_DIR/tmux/theme.conf"
+dest="$HOME/.config/tmux/theme.conf"
+if [[ ! -f "$src" ]]; then
+    echo "  [ERROR] Source file not found: $src"
+else
+    if [[ -f "$dest" ]]; then
+        echo "  [BACKUP] $dest -> ${dest}.bak"
+        cp "$dest" "${dest}.bak"
+    fi
+    sed "s|/home/airo-workstation|$HOME|g" "$src" > "$dest"
+    echo "  [COPY] $src -> $dest (home path substituted)"
+fi
 
 # Install TPM
 TPM_DIR="$HOME/.config/tmux/plugins/tpm"
