@@ -20,9 +20,10 @@ mkdir -p "$HOME/.config/tmux"
 install_file "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
 install_file "$DOTFILES_DIR/tmux/keybindings.conf" "$HOME/.config/tmux/keybindings.conf"
 
-# Copy theme.conf with home directory substitution for portability
+# Copy theme.conf with placeholder substitution for portability
 install_file "$DOTFILES_DIR/tmux/theme.conf" "$HOME/.config/tmux/theme.conf"
 sed -i "s|__HOME__|$HOME|g" "$HOME/.config/tmux/theme.conf"
+substitute_glyphs "$HOME/.config/tmux/theme.conf"
 
 # Install TPM
 TPM_DIR="$HOME/.config/tmux/plugins/tpm"

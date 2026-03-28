@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+# Substitute glyph placeholders with actual Unicode characters.
+# Keeps config files editor-safe by avoiding invisible Unicode literals.
+#   Usage: substitute_glyphs <file>
+substitute_glyphs() {
+    local file="$1"
+    sed -i \
+        -e "s|__PILL_L__|$(printf '\ue0b6')|g" \
+        -e "s|__PILL_R__|$(printf '\ue0b4')|g" \
+        -e "s|__ICON_TERMINAL__|$(printf '\U000f018d')|g" \
+        -e "s|__ICON_FOLDER__|$(printf '\U000f024b')|g" \
+        -e "s|__ICON_CPU__|$(printf '\uf4bc')|g" \
+        -e "s|__ICON_MEMORY__|$(printf '\uefc5')|g" \
+        -e "s|__ICON_CALENDAR__|$(printf '\U000f00f0')|g" \
+        "$file"
+}
+
 # Check if required commands are available
 check_commands() {
     local missing=()
