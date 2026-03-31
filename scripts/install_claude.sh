@@ -11,6 +11,11 @@ check_commands jq || exit 1
 SRC="$DOTFILES_DIR/claude/settings.json"
 DEST="$HOME/.claude/settings.json"
 
+if [[ ! -f "$SRC" ]]; then
+    echo "  [ERROR] Source file not found: $SRC"
+    exit 1
+fi
+
 mkdir -p "$HOME/.claude"
 
 if [[ -f "$DEST" ]]; then
@@ -21,8 +26,10 @@ if [[ -f "$DEST" ]]; then
 
     # Deep merge: existing (base) * dotfiles (override)
     TMPFILE="$(mktemp)"
+    trap 'rm -f "$TMPFILE"' EXIT
     jq -s '.[0] * .[1]' "$DEST" "$SRC" > "$TMPFILE"
     mv "$TMPFILE" "$DEST"
+    trap - EXIT
     echo "  [MERGE] $SRC -> $DEST"
 else
     cp "$SRC" "$DEST"
