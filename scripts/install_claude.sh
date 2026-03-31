@@ -36,4 +36,45 @@ else
     echo "  [COPY] $SRC -> $DEST"
 fi
 
+# Add shell alias for Claude Code
+SHELL_NAME="$(basename "$SHELL")"
+case "$SHELL_NAME" in
+    bash)
+        RC_FILE="$HOME/.bashrc"
+        ALIAS_LINE="alias cc='claude --dangerously-skip-permissions'"
+        ;;
+    zsh)
+        RC_FILE="$HOME/.zshrc"
+        ALIAS_LINE="alias ccd='claude --dangerously-skip-permissions'"
+        ;;
+    *)
+        echo "  [WARN] Unsupported shell: $SHELL_NAME. Skipping alias setup."
+        RC_FILE=""
+        ;;
+esac
+
+if [[ -n "$RC_FILE" ]]; then
+    # Add alias
+    if [[ -f "$RC_FILE" ]] && grep -qF "$ALIAS_LINE" "$RC_FILE"; then
+        echo "  [SKIP] Alias already exists in $RC_FILE"
+    else
+        echo "$ALIAS_LINE" >> "$RC_FILE"
+        echo "  [ADD] $ALIAS_LINE -> $RC_FILE"
+    fi
+
+    # Add environment variables
+    EXPORTS=(
+        "export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1"
+        "export CLAUDE_CODE_NO_FLICKER=1"
+    )
+    for EXPORT_LINE in "${EXPORTS[@]}"; do
+        if [[ -f "$RC_FILE" ]] && grep -qF "$EXPORT_LINE" "$RC_FILE"; then
+            echo "  [SKIP] Already exists in $RC_FILE: $EXPORT_LINE"
+        else
+            echo "$EXPORT_LINE" >> "$RC_FILE"
+            echo "  [ADD] $EXPORT_LINE -> $RC_FILE"
+        fi
+    done
+fi
+
 echo "==> Claude Code settings installed"
