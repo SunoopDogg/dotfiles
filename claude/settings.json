@@ -1,4 +1,8 @@
 {
+  "model": "sonnet[1m]",
+  "effortLevel": "xhigh",
+  "advisorModel": "opus",
+  "skipDangerousModePermissionPrompt": true,
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
@@ -23,7 +27,5 @@
         "repo": "Owloops/claude-powerline"
       }
     }
-  },
-  "effortLevel": "high",
-  "skipDangerousModePermissionPrompt": true
+  }
 }
