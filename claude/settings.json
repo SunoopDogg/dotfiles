@@ -12,7 +12,8 @@
     "claude-code-setup@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "claude-notifications-go@claude-notifications-go": true,
-    "claude-powerline@claude-powerline": true
+    "claude-powerline@claude-powerline": true,
+    "andrej-karpathy-skills@karpathy-skills": true
   },
   "extraKnownMarketplaces": {
     "claude-notifications-go": {
@@ -25,6 +26,12 @@
       "source": {
         "source": "github",
         "repo": "Owloops/claude-powerline"
+      }
+    },
+    "karpathy-skills": {
+      "source": {
+        "source": "github",
+        "repo": "forrestchang/andrej-karpathy-skills"
       }
     }
   }
