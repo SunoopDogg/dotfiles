@@ -1,8 +1,9 @@
 {
   "model": "sonnet[1m]",
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "advisorModel": "opus",
   "skipDangerousModePermissionPrompt": true,
+  "remoteControlAtStartup": true,
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
