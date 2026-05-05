@@ -14,7 +14,8 @@
     "pyright-lsp@claude-plugins-official": true,
     "claude-notifications-go@claude-notifications-go": true,
     "claude-powerline@claude-powerline": true,
-    "andrej-karpathy-skills@karpathy-skills": true
+    "andrej-karpathy-skills@karpathy-skills": true,
+    "caveman@caveman": true
   },
   "extraKnownMarketplaces": {
     "claude-notifications-go": {
@@ -33,6 +34,12 @@
       "source": {
         "source": "github",
         "repo": "forrestchang/andrej-karpathy-skills"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
       }
     }
   }
